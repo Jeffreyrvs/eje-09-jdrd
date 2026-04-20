@@ -7,11 +7,15 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { LoginUserDto } from './dto/login-user.dto';
 import { NotFoundError } from 'rxjs';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
   // Para usar registrar la base de datos
-  constructor(@InjectRepository(User) private userRepository: Repository<User>) {}
+  constructor(
+    @InjectRepository(User) private userRepository: Repository<User>,
+    private jwtSevice: JwtService      
+  ) {}
 
   async create(createUserDto: CreateUserDto) {
     // Desestructurar
@@ -64,7 +68,19 @@ export class AuthService {
       throw new UnauthorizedException(error);  
     }
 
-    // 3. Regresar el token JWT 
+    // 3. Regresar el token JWT (JSON Web Token)
+    // El token es la credencial
+    // Datos significativos
+    // Sub - Sujeto - Identificador de manera única
+    const payload = {
+      sub: emailExist.id,
+      name: emailExist.name,
+      email: emailExist.email
+    };
+
+    const token = await this.jwtSevice.signAsync(payload);
+
+    return {token};
   }
 
   findAll() {
