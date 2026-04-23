@@ -5,11 +5,11 @@ export class LoginUserDto {
     @IsNotEmpty()
     @IsString()
     @IsEmail()
-    email: string;
+    email!: string;
 
     @IsNotEmpty()
     @MinLength(8)
     @IsString()
-    password: string;
+    password!: string;
     
 }
